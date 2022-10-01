@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 
 
 // TODO: Replace this endpoint with your REST API endpoint
-const LEAD_API = 'http://localhost:8000/leads';
+const LEAD_API = 'http://localhost:8000/unity/subscriber';
 
 export const LeadWidget = function (props) {
 
@@ -27,7 +27,8 @@ export const LeadWidget = function (props) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        email: email
+        email: email,
+        status:1
       })
     }).then(
         resp => resp.json()

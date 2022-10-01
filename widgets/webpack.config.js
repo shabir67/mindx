@@ -1,4 +1,5 @@
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
   entry: './src/index.js',
@@ -17,6 +18,9 @@ module.exports = {
   watchOptions: {
     poll: 1000,
   },
+  plugins: [
+    new HtmlWebpackPlugin()
+  ],
   module: {
     rules: [
       {
