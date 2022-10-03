@@ -1,3 +1,4 @@
+from urllib import request
 from django.http import HttpResponse
 from rest_framework.decorators import api_view
 from rest_framework import status
@@ -9,6 +10,10 @@ from datetime import datetime
 from rest_framework.generics import CreateAPIView
 from rest_framework.views import APIView
 from django.shortcuts import render
+from celery import shared_task
+from django.conf import settings
+from django.core.mail import send_mail
+import json
 
 # Create your views here.
 
@@ -37,7 +42,6 @@ class ListCreateSubsView(CreateAPIView, APIView):
         today = datetime.today()
         datem = datetime(today.year, today.month, 1)
 
-
         subs_count_monthly = Subscriber.objects.filter(deleted_dates__isnull=True, status=1,created_dates__year=year, created_dates__month=month).count()
 
         unsubs_count_monthly = Subscriber.objects.filter(deleted_dates__isnull=True, status=0, deleted_dates__year=year, deleted_dates__month=month).count()
@@ -46,8 +50,6 @@ class ListCreateSubsView(CreateAPIView, APIView):
 
         subs = [sub.serialize for sub in obj]
         
-        my = month, year
-
         res = {
             'subs_count_on_month': subs_count_monthly,
             'unsubs_count_on_month': unsubs_count_monthly,
@@ -56,12 +58,22 @@ class ListCreateSubsView(CreateAPIView, APIView):
             'date': datem
         }
         return render(request, 'dash.html', res)
-
         
-
 def dash(request):
     data = ListCreateSubsView()
     context = {
         'data': data.get(request),
     }
     return render( request, 'dash.html', context)
+
+@shared_task
+def send_email_task():
+    d1 = ListCreateSubsView()
+    data = d1.get(request)
+    print("Mail666 sending.......")
+    subject = 'welcome to Celery world'
+    message = json.dumps(data)
+    email_from = settings.EMAIL_HOST_USER
+    recipient_list = ['souba67@gmail.com', ]
+    send_mail( subject, message, email_from, recipient_list )
+    return "Mail has been sent........"

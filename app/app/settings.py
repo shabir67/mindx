@@ -38,9 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'django_celery_beat',
     'unity.apps.UnityConfig',
     'rest_framework',
     'corsheaders',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -55,7 +57,6 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True # If this is used then `CORS_ALLOWED_ORIGINS` will not have any effect
 
 ROOT_URLCONF = 'app.urls'
 
@@ -77,6 +78,40 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'app.wsgi.application'
 
+# to answer this question : The widget itself sits on seller's online store (3rd party site) and sends data to your app (Konigle). The API is public but we don't want anyone to misuse it.
+CORS_ALLOWED_ORIGINS = [
+# List of address that can be used latter for future development
+# "https://domain.com",
+# "https://api.domain.com",
+"http://localhost:8000",
+"http://127.0.0.1:9000"
+]
+
+CORS_ALLOW_METHODS = [
+'GET',
+'POST',
+]
+
+# Celery Email 
+EMAIL_BACKEND ='django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'konigle01unity@gmail.com'
+EMAIL_HOST_PASSWORD = 'rolqsxzyklgkpbet'
+
+# Celery Config
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Jakarta'
+
+# Store task status in django db
+CELERY_RESULT_BACKEND = 'django-db'
+
+# Celery beat setting
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
